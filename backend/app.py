@@ -1,6 +1,7 @@
 import os
 import sys
 from flask import Flask, request, jsonify
+from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
 
 # Add parent directory to path to support executing from package root
@@ -17,18 +18,21 @@ app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing (CORS) for production/development
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+@app.errorhandler(Exception)
+def handle_general_exception(error):
+    if isinstance(error, HTTPException):
+        return jsonify({
+            "success": False,
+            "error": error.name,
+            "message": error.description
+        }), error.code
 
-@app.errorhandler(ValidationError)
-def handle_validation_error(error):
-    """Exception handler for invalid user inputs."""
-    logger.warning(f"Bad request received: {error.message}")
-    response = jsonify({
+    logger.exception(f"Unhandled server error: {str(error)}")
+    return jsonify({
         "success": False,
-        "error": "Validation Error",
-        "message": error.message
-    })
-    response.status_code = 400
-    return response
+        "error": "Internal Server Error",
+        "message": "An unexpected error occurred. Please try again later."
+    }), 500
 
 
 @app.errorhandler(Exception)
