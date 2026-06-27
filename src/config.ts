@@ -1,1 +1,2 @@
-export const API_BASE = import.meta.env.VITE_API_URL || window.location.origin;
+const rawApiUrl = import.meta.env.VITE_API_URL;
+export const API_BASE = rawApiUrl ? rawApiUrl.replace(/\/+$/g, '') : `${window.location.origin}/api`;

@@ -348,26 +348,10 @@ async function startServer() {
 
   // --- API ROUTE HANDLERS WITH FAILOVER CAPABILITY ---
 
-  app.get("/api/health", async (req, res) => {
-    // Try to query python health
-    const proxied = await forwardToPython(req, res, "/health", "GET", {});
-    if (proxied) return;
-
-    res.json({
-      status: "healthy",
-      service: "Real Estate Price Prediction and Investment Analyzer API (TypeScript Fallback Simulation Mode)",
-      model_status: "fallback_loaded",
-      is_ml_prediction_ready: false,
-      version: "1.0.0-ts-fallback"
-    });
-  });
-
-  app.post("/api/predict", async (req, res) => {
-    // Attempt forwarding to Python
+  async function handlePredictRequest(req: any, res: any) {
     const proxied = await forwardToPython(req, res, "/predict", "POST", req.body);
     if (proxied) return;
 
-    // Failover
     try {
       const result = runLocalPrediction(req.body);
       res.json({
@@ -382,6 +366,52 @@ async function startServer() {
         message: e.message || "An error occurred during prediction."
       });
     }
+  }
+
+  async function handleMetricsRequest(req: any, res: any) {
+    const proxied = await forwardToPython(req, res, "/metrics", "GET", {});
+    if (proxied) return;
+
+    res.json({
+      success: true,
+      metrics: {
+        algorithm: "Gradient Boosting Regressor (Scikit-Learn Falling Back to TypeScript Math engine)",
+        is_trained: true,
+        r2_score: 0.8942,
+        mean_squared_error_rmse: 24320.15,
+        feature_names: ["area_sqft", "bedrooms", "bathrooms", "age", "condition_grade", "loc_Downtown", "loc_Suburbs", "loc_Uptown", "loc_Waterfront", "loc_Westside", "loc_Eastside"],
+        feature_importances: {
+          "area_sqft": 0.54,
+          "loc_Waterfront": 0.21,
+          "age": 0.08,
+          "condition_grade": 0.06,
+          "bedrooms": 0.04,
+          "bathrooms": 0.03,
+          "loc_Downtown": 0.02,
+          "loc_Uptown": 0.01,
+          "loc_Westside": 0.01
+        }
+      }
+    });
+  }
+
+  app.post("/predict", handlePredictRequest);
+  app.post("/api/predict", handlePredictRequest);
+  app.get("/metrics", handleMetricsRequest);
+  app.get("/api/metrics", handleMetricsRequest);
+
+  app.get("/api/health", async (req, res) => {
+    // Try to query python health
+    const proxied = await forwardToPython(req, res, "/health", "GET", {});
+    if (proxied) return;
+
+    res.json({
+      status: "healthy",
+      service: "Real Estate Price Prediction and Investment Analyzer API (TypeScript Fallback Simulation Mode)",
+      model_status: "fallback_loaded",
+      is_ml_prediction_ready: false,
+      version: "1.0.0-ts-fallback"
+    });
   });
 
   app.post("/api/investment", async (req, res) => {
@@ -406,34 +436,6 @@ async function startServer() {
     }
   });
 
-  app.get("/api/metrics", async (req, res) => {
-    // Attempt forwarding to Python
-    const proxied = await forwardToPython(req, res, "/metrics", "GET", {});
-    if (proxied) return;
-
-    // Failover
-    res.json({
-      success: true,
-      metrics: {
-        algorithm: "Gradient Boosting Regressor (Scikit-Learn Falling Back to TypeScript Math engine)",
-        is_trained: true,
-        r2_score: 0.8942,
-        mean_squared_error_rmse: 24320.15,
-        feature_names: ["area_sqft", "bedrooms", "bathrooms", "age", "condition_grade", "loc_Downtown", "loc_Suburbs", "loc_Uptown", "loc_Waterfront", "loc_Westside", "loc_Eastside"],
-        feature_importances: {
-          "area_sqft": 0.54,
-          "loc_Waterfront": 0.21,
-          "age": 0.08,
-          "condition_grade": 0.06,
-          "bedrooms": 0.04,
-          "bathrooms": 0.03,
-          "loc_Downtown": 0.02,
-          "loc_Uptown": 0.01,
-          "loc_Westside": 0.01
-        }
-      }
-    });
-  });
 
   // Serve static assets in production, or mount Vite dev middleware in development
   if (process.env.NODE_ENV !== "production") {
