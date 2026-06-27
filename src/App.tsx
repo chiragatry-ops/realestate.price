@@ -7,6 +7,8 @@ import { Investment } from './pages/Investment';
 import { ModelMetadata } from './types';
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export default function App() {
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [darkMode, setDarkMode] = useState<boolean>(true);
@@ -31,7 +33,7 @@ export default function App() {
   // Load Model metrics from server on mount
   const fetchMetadata = async () => {
     try {
-      const response = await axios.get('/api/metrics');
+      const response = await axios.get(`${API_BASE}/api/metrics`);
       if (response.data?.success) {
         setMetadata(response.data.metrics);
       }

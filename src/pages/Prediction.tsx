@@ -30,7 +30,7 @@ export const Prediction: React.FC<PredictionProps> = ({ onSendToROI }) => {
 
     try {
       // Direct call to backend prediction API
-      const response = await axios.post('/api/predict', inputs);
+      const response = await axios.post(`${API_BASE}/api/predict`, inputs);
       if (response.data?.success) {
         setResult(response.data.data);
       } else {
