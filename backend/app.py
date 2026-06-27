@@ -44,6 +44,18 @@ def handle_general_exception(error):
     return response
 
 
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({
+        "success": True,
+        "message": "Real Estate Price Prediction API is running!",
+        "health": "/health",
+        "predict": "/predict",
+        "investment": "/investment",
+        "metrics": "/metrics"
+    }), 200    
+
+
 @app.route("/health", methods=["GET"])
 def health_check():
     """
