@@ -1,0 +1,6 @@
+{
+  "name": "Real Estate Price Prediction and Investment Analyzer",
+  "description": "A production-ready Python Flask backend and React frontend for predicting property prices using Gradient Boosting and analyzing investment potential.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
