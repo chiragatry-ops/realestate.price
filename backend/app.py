@@ -85,22 +85,29 @@ def health_check():
     }), 200
 
 
-@app.route("/predict", methods=["POST"])
-def api_predict():
+def _predict_route():
     """
-    POST /predict
-    Accepts JSON property profiles, runs the model, and returns predicted market values.
+    Internal helper for prediction routes.
     """
     data = request.get_json() or {}
     logger.info("Received request for property price prediction.")
     
-    # Predict price
     result = predict_property_price(data)
     
     return jsonify({
         "success": True,
         "data": result
     }), 200
+
+
+@app.route("/predict", methods=["POST"])
+def api_predict():
+    return _predict_route()
+
+
+@app.route("/api/predict", methods=["POST"])
+def api_predict_alias():
+    return _predict_route()
 
 
 @app.route("/investment", methods=["POST"])
@@ -124,15 +131,12 @@ def api_investment():
     }), 200
 
 
-@app.route("/metrics", methods=["GET"])
-def api_metrics():
+def _metrics_route():
     """
-    GET /metrics
-    Returns performance metrics of the trained GradientBoostingRegressor model.
+    Internal helper for metrics routes.
     """
     logger.info("Received request for model performance metrics.")
     
-    # If the model is not trained/loaded yet, try loading it
     if model_manager.model is None:
         model_manager.load_model()
         
@@ -149,6 +153,16 @@ def api_metrics():
             "feature_importances": metadata.get("feature_importances", {})
         }
     }), 200
+
+
+@app.route("/metrics", methods=["GET"])
+def api_metrics():
+    return _metrics_route()
+
+
+@app.route("/api/metrics", methods=["GET"])
+def api_metrics_alias():
+    return _metrics_route()
 
 
 @app.route("/train", methods=["POST"])
