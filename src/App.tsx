@@ -5,9 +5,8 @@ import { Home } from './pages/Home';
 import { Prediction } from './pages/Prediction';
 import { Investment } from './pages/Investment';
 import { ModelMetadata } from './types';
+import { API_BASE } from './config';
 import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<string>('home');

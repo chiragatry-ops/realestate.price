@@ -4,6 +4,7 @@ import { PredictionForm } from '../components/PredictionForm';
 import { Map } from '../components/Map';
 import { Loading } from '../components/Loading';
 import { Compass, Sparkles, AlertCircle, ArrowRight, DollarSign, Calendar, TrendingUp } from 'lucide-react';
+import { API_BASE } from '../config';
 import axios from 'axios';
 
 interface PredictionProps {
