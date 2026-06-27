@@ -32,7 +32,7 @@ export default function App() {
   // Load Model metrics from server on mount
   const fetchMetadata = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/api/metrics`);
+      const response = await axios.get(`${API_BASE}/metrics`);
       if (response.data?.success) {
         setMetadata(response.data.metrics);
       }
